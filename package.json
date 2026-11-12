@@ -1,0 +1,20 @@
+{
+  "name": "isr-2027-automation",
+  "private": true,
+  "scripts": {
+    "test": "cucumber-js",
+    "test:home": "cucumber-js --tags @home",
+    "test:confirm": "cucumber-js --tags @confirm",
+    "test:verify": "cucumber-js --tags @verify",
+    "test:regression": "cucumber-js --tags @regression"
+  },
+  "devDependencies": {
+    "@cucumber/cucumber": "^13.3.0",
+    "@playwright/test": "^1.65.0",
+    "@types/node": "^26.6.6",
+    "dotenv": "^18.0.10",
+    "exceljs": "^4.4.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3"
+  }
+}
