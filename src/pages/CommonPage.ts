@@ -49,7 +49,9 @@ export class CommonPage {
   // Compares the text on screen with the expected text from Excel.
   // "screen" and "language" are the Screen and Language columns of the Excel row.
   // Check 1: text and spacing – every word, space, punctuation mark and line break must match.
-  // Check 2: bold – every part that is bold in Excel must be bold on screen.
+  // Check 2: bold – the bold parts on screen must be the same as the bold parts
+  //          in Excel (text that should be bold but is not, and text that is
+  //          bold but should be normal).
   // Example:
   //   await this.pages.common.validateText(this.pages.common.helpBody, 'VERIFY_ADDRESS_Help_Text', 'EN');
   async validateText(locator: Locator, screen: string, language: string): Promise<void> {

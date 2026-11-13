@@ -20,7 +20,7 @@ export class HomePage {
 
   // Types the given Census ID into the Census ID box.
   async enterCensusId(censusId: string): Promise<void> {
-    await this.censusIdInput.fill(censusId);
+    await this.censusIdInput.pressSequentially(censusId);
   }
 
   // Clicks the Log In button.
