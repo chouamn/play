@@ -13,7 +13,6 @@ module.exports = {
     // Progress in the terminal, plus HTML and JSON reports
     format: [
       'progress',
-      'html:reports/cucumber-report.html',
       'json:reports/cucumber-report.json',
     ],
   },
