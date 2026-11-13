@@ -35,3 +35,11 @@ When('the responder clicks the Close button on the Help modal popup', async func
 Then('the Help modal popup is closed', async function (this: CustomWorld) {
   await expect(this.pages.common.helpModal).toBeHidden();
 });
+
+// Compares the Help pop-up text and bold with one row of the Excel file.
+// The feature file gives the Excel row name and the language, e.g.:
+//   And the responder validates the Help text "VERIFY_ADDRESS_Help_Text" in "EN"
+// This one step works for the Help pop-up on EVERY screen.
+Then('the responder validates the Help text {string} in {string}', async function (this: CustomWorld, excelRow: string, language: string) {
+  await this.pages.common.validateText(this.pages.common.helpBody, excelRow, language);
+});

@@ -7,9 +7,12 @@ Given('the responder is on the Census home page', async function (this: CustomWo
   await this.pages.home.navigateToHomepage();
 });
 
-// Types the valid Census ID from .env.uat (CENSUS_ID_VALID_1) into the Census ID box.
-When('the responder enters a valid 12-digit Census ID', async function (this: CustomWorld) {
-  await this.pages.home.enterCensusId(ConfigReader.get('CENSUS_ID_VALID_1'));
+// Types a Census ID into the Census ID box.
+// The feature file gives the NAME of the setting in .env.uat, e.g.:
+//   When the responder enters the Census ID "CENSUS_ID_VALID_1"
+// The real Census ID stays hidden in .env.uat.
+When('the responder enters the Census ID {string}', async function (this: CustomWorld, censusIdKey: string) {
+  await this.pages.home.enterCensusId(ConfigReader.get(censusIdKey));
 });
 
 // Clicks the Log In button.
