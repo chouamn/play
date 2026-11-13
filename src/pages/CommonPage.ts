@@ -64,16 +64,68 @@ export class CommonPage {
       throw new Error(this.describeTextDifference(actualText, expectedText.text, screen));
     }
 
-    // Check 2: bold parts
-    for (const boldText of expectedText.boldParts) {
-      if (boldText === actualText.trim()) {
-        // The whole element is bold (e.g. a heading)
-        await this.verifyTextIsBold(locator);
-      } else {
-        // Only part of the text is bold: find that part inside the element
-        await this.verifyTextIsBold(locator.getByText(boldText, { exact: true }));
-      }
+    // Check 2: bold – the bold parts on screen must be the same as in Excel.
+    // This catches both mistakes: text that should be bold but is not,
+    // and text that is bold but should be normal.
+    const boldOnScreen = await this.readBoldParts(locator);
+    const boldInExcel = expectedText.boldParts.map(part => this.removeExtraSpaces(part));
+
+    const missingBold = boldInExcel.filter(part => !boldOnScreen.includes(part));
+    const extraBold = boldOnScreen.filter(part => !boldInExcel.includes(part));
+
+    if (missingBold.length > 0 || extraBold.length > 0) {
+      throw new Error(
+        `Bold text on screen is different from Excel row "${screen}"\n` +
+        `  Bold in Excel, but NOT bold on screen: ${this.showList(missingBold)}\n` +
+        `  Bold on screen, but NOT bold in Excel: ${this.showList(extraBold)}`
+      );
     }
+  }
+
+  // Reads from the screen every part of the text that is bold.
+  // It looks at each piece of text inside the element and asks the browser
+  // for its font weight: 400 is normal, 600 or more is bold.
+  private async readBoldParts(locator: Locator): Promise<string[]> {
+    return locator.evaluate(element => {
+      const boldParts: string[] = [];
+      let currentBoldPart = '';
+
+      const walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT);
+      let textPiece = walker.nextNode();
+
+      while (textPiece) {
+        const text = textPiece.textContent ?? '';
+        const isBlank = text.trim() === '';
+        const fontWeight = Number(window.getComputedStyle(textPiece.parentElement as Element).fontWeight);
+
+        if ((fontWeight >= 600 && !isBlank) || (isBlank && currentBoldPart !== '')) {
+          currentBoldPart += text;                 // still inside a bold part
+        } else if (!isBlank) {
+          if (currentBoldPart.trim() !== '') {
+            boldParts.push(currentBoldPart);       // the bold part has ended
+          }
+          currentBoldPart = '';
+        }
+        textPiece = walker.nextNode();
+      }
+      if (currentBoldPart.trim() !== '') {
+        boldParts.push(currentBoldPart);           // bold part at the very end
+      }
+
+      // Tidy up: one space between words, no spaces at the edges
+      return boldParts.map(part => part.split(/\s+/).join(' ').trim());
+    });
+  }
+
+  // "Why  do\n we ask?" -> "Why do we ask?" (spacing itself is already checked in Check 1)
+  private removeExtraSpaces(text: string): string {
+    return text.split(/\s+/).join(' ').trim();
+  }
+
+  // Shows a list of texts in an error message, or "(none)" when it is empty.
+  private showList(parts: string[]): string {
+    if (parts.length === 0) return '(none)';
+    return parts.map(part => `"${part}"`).join(', ');
   }
 
   // Builds the error message for a text mismatch.
@@ -112,7 +164,7 @@ export class CommonPage {
     if (character === undefined) return 'nothing (the text ends here)';
     if (character === ' ') return 'a space';
     if (character === '\n') return 'a line break';
-    if (character === ' ') return 'a non-breaking space';
+    if (character === '\u00A0') return 'a non-breaking space';
     if (character === '\t') return 'a tab';
     return `[${character}]`;
   }
@@ -122,7 +174,7 @@ export class CommonPage {
     return text
       .split(' ').join('·')
       .split('\n').join('⏎')
-      .split(' ').join('[NBSP]')
+      .split('\u00A0').join('[NBSP]')
       .split('\t').join('[TAB]');
   }
 

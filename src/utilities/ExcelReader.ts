@@ -82,9 +82,26 @@ export class ExcelReader {
 
       const text = pieces.map(piece => piece.text).join('');   // glue all pieces together
 
-      const boldParts = pieces
-        .filter(piece => piece.font?.bold && piece.text.trim() !== '') // keep only bold pieces
-        .map(piece => piece.text.trim());                              // remove edge spaces/line breaks
+      // Collect the bold parts. Excel sometimes saves one bold sentence as
+      // several pieces, so bold pieces that sit next to each other are joined.
+      const boldParts: string[] = [];
+      let currentBoldPart = '';
+
+      for (const piece of pieces) {
+        const isBlank = piece.text.trim() === '';
+
+        if (piece.font?.bold || (isBlank && currentBoldPart !== '')) {
+          currentBoldPart += piece.text;            // still inside a bold part
+        } else if (!isBlank) {
+          if (currentBoldPart.trim() !== '') {
+            boldParts.push(currentBoldPart.trim()); // the bold part has ended
+          }
+          currentBoldPart = '';
+        }
+      }
+      if (currentBoldPart.trim() !== '') {
+        boldParts.push(currentBoldPart.trim());     // bold part at the very end
+      }
 
       return { text, boldParts };
     }
