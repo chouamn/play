@@ -60,8 +60,9 @@ export class CommonPage {
     await expect(locator).toBeVisible();
     const actualText = await locator.innerText();
 
-    expect(actualText, `Text or spacing on screen is different from Excel row "${screen}"`)
-      .toBe(expectedText.text);
+    if (actualText !== expectedText.text) {
+      throw new Error(this.describeTextDifference(actualText, expectedText.text, screen));
+    }
 
     // Check 2: bold parts
     for (const boldText of expectedText.boldParts) {
@@ -73,6 +74,56 @@ export class CommonPage {
         await this.verifyTextIsBold(locator.getByText(boldText, { exact: true }));
       }
     }
+  }
+
+  // Builds the error message for a text mismatch.
+  // It finds the FIRST character that is different and shows it, with the text around it.
+  private describeTextDifference(actualText: string, expectedText: string, screen: string): string {
+    // Walk through both texts until the characters stop matching
+    let position = 0;
+    while (
+      position < actualText.length &&
+      position < expectedText.length &&
+      actualText[position] === expectedText[position]
+    ) {
+      position++;
+    }
+
+    // Which line of the text is it on? (count the line breaks before it)
+    const lineNumber = expectedText.slice(0, position).split('\n').length;
+
+    // Take 25 characters before and after the difference, to show where it is
+    const from = Math.max(0, position - 25);
+    const to = position + 25;
+
+    return (
+      `Text or spacing on screen is different from Excel row "${screen}"\n` +
+      `First difference: line ${lineNumber}, character ${position + 1}\n` +
+      `  Excel has:  ${this.showCharacter(expectedText[position])}\n` +
+      `  Screen has: ${this.showCharacter(actualText[position])}\n` +
+      `  Excel text:  ...${this.showSpaces(expectedText.slice(from, to))}...\n` +
+      `  Screen text: ...${this.showSpaces(actualText.slice(from, to))}...\n` +
+      `  (a space is shown as · and a line break as ⏎)`
+    );
+  }
+
+  // Describes one character in words, so invisible characters can be seen.
+  private showCharacter(character: string | undefined): string {
+    if (character === undefined) return 'nothing (the text ends here)';
+    if (character === ' ') return 'a space';
+    if (character === '\n') return 'a line break';
+    if (character === ' ') return 'a non-breaking space';
+    if (character === '\t') return 'a tab';
+    return `[${character}]`;
+  }
+
+  // Makes spaces and line breaks visible in a piece of text.
+  private showSpaces(text: string): string {
+    return text
+      .split(' ').join('·')
+      .split('\n').join('⏎')
+      .split(' ').join('[NBSP]')
+      .split('\t').join('[TAB]');
   }
 
   // Checks that an element's text is bold.
