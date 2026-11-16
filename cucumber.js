@@ -10,7 +10,7 @@ module.exports = {
       'src/utilities/Hooks.ts',
       'src/steps/*.ts',
     ],
-    // Progress in the terminal, plus HTML and JSON reports
+    // Progress in the terminal, plus the JSON results that ReportGenerator turns into the HTML and PDF reports
     format: [
       'progress',
       'json:reports/cucumber-report.json',

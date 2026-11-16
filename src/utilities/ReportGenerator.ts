@@ -6,7 +6,7 @@ import { ConfigReader } from './ConfigReader';
  * ReportGenerator
  * ---------------
  * Builds the team's test report from Cucumber's JSON results:
- *   reports/ISR_Test_Report.html  – dark, interactive, for the team
+ *   reports/ISR_Test_Report.html  – light, interactive, for the team
  *   reports/ISR_Test_Report.pdf   – light, every scenario open, for printing and evidence
  *
  * The team never edits this file. It is run by RunTests.ts after every test run,
@@ -234,13 +234,13 @@ export class ReportGenerator {
   }
 }
 
-// ---------- look of the report: dark on screen, light when printed to PDF ----------
+// ---------- look of the report: light on screen and in the PDF ----------
 const STYLES = `
-:root{--bg:#0b0f14;--panel:#11161d;--line:#1f2a37;--text:#c9d4e0;--dim:#7d8b9c;--head:#e6edf3;--accent:#22d3ee;--ok:#22c55e;--ko:#ef4444;--errbg:#1a0f12;--errtx:#fca5a5;--exp:#86efac}
+:root{--bg:#f6f8fa;--panel:#ffffff;--line:#d0d7de;--text:#1f2328;--dim:#57606a;--head:#0b0f14;--accent:#0969da;--ok:#1a7f37;--ko:#cf222e;--errbg:#fff5f5;--errtx:#82071e;--exp:#1a7f37}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:14px/1.5 "Segoe UI",system-ui,sans-serif}
 .mono,code,pre,.t,.dur,.kpi b,.meta b,.status,.pill{font-family:"JetBrains Mono",Consolas,monospace}
 header{display:flex;align-items:center;gap:18px;padding:18px 40px;border-bottom:1px solid var(--line);background:var(--panel)}
-.plate{background:#fff;border-radius:8px;padding:6px 12px;display:flex;align-items:center}.plate img{height:48px;display:block}
+.plate{background:#fff;border:1px solid var(--line);border-radius:8px;padding:6px 12px;display:flex;align-items:center}.plate img{height:48px;display:block}
 header h1{margin:0;font-size:20px;color:var(--head)}header .sub{color:var(--dim);font-size:12px;letter-spacing:2px;text-transform:uppercase}
 .status{margin-left:auto;padding:8px 18px;border-radius:6px;font-weight:700;letter-spacing:2px;border:1px solid}
 .status.FAILED{color:var(--ko);border-color:var(--ko)}.status.PASSED{color:var(--ok);border-color:var(--ok)}
@@ -257,12 +257,12 @@ main{padding:28px 40px;max-width:1360px;margin:auto}
 h2{font-size:12px;letter-spacing:2px;color:var(--dim);margin:26px 0 10px;text-transform:uppercase}
 table{width:100%;border-collapse:collapse;background:var(--panel);border:1px solid var(--line)}
 th,td{padding:10px 14px;border-bottom:1px solid var(--line);text-align:left}th{font-size:11px;letter-spacing:1.5px;color:var(--dim);font-weight:600}
-.bar{height:6px;background:#ef444455;border-radius:3px;overflow:hidden;width:180px}.bar span{display:block;height:100%;background:var(--ok)}
+.bar{height:6px;background:#ffcecb;border-radius:3px;overflow:hidden;width:180px}.bar span{display:block;height:100%;background:var(--ok)}
 .ok{color:var(--ok)}.ko{color:var(--ko)}.sk{color:#64748b}
-.card{background:var(--panel);border:1px solid var(--line);border-radius:8px;margin-bottom:12px}.card.failed{border-color:#ef444466}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:8px;margin-bottom:12px;box-shadow:0 1px 2px #1f232814}.card.failed{border-color:#ef444466}
 summary{display:flex;align-items:center;gap:14px;padding:14px 18px;cursor:pointer;list-style:none}
-.pill{font-size:11px;font-weight:700;padding:3px 9px;border-radius:4px;letter-spacing:1px}.pill.passed{background:#22c55e22;color:var(--ok)}.pill.failed{background:#ef444422;color:var(--ko)}
-.scn{color:var(--head);font-weight:600}.tags i{font-style:normal;font-size:11px;color:var(--accent);border:1px solid #22d3ee44;border-radius:10px;padding:1px 8px;margin-right:6px}
+.pill{font-size:11px;font-weight:700;padding:3px 9px;border-radius:4px;letter-spacing:1px}.pill.passed{background:#dafbe1;color:var(--ok)}.pill.failed{background:#ffebe9;color:var(--ko)}
+.scn{color:var(--head);font-weight:600}.tags i{font-style:normal;font-size:11px;color:var(--accent);border:1px solid var(--line);border-radius:10px;padding:1px 8px;margin-right:6px}
 .dur{margin-left:auto;color:var(--dim)}.feat{padding:0 18px 6px;color:var(--dim);font-size:12px}
 .steps{list-style:none;margin:0;padding:6px 18px 16px}.steps li{padding:7px 0;border-top:1px dashed var(--line)}.steps .kw{color:var(--accent);font-weight:600;margin:0 6px 0 8px}
 .steps .t{float:right;color:var(--dim);font-size:12px}.steps li.skipped{color:#64748b}.steps li.skipped .kw{color:#64748b}
