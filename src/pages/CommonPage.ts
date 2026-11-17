@@ -8,8 +8,10 @@ import { ExcelReader } from '../utilities/ExcelReader';
 // used by every screen.
 export class CommonPage {
   readonly yesRadio: Locator;
+  readonly noRadio: Locator;
   readonly nextButton: Locator;
   readonly helpLink: Locator;
+  readonly whoShouldIIncludeLink: Locator;
   readonly helpModal: Locator;
   readonly helpBody: Locator;
   readonly helpCloseButton: Locator;
@@ -18,8 +20,10 @@ export class CommonPage {
   // helpModal is set first, because helpBody and helpCloseButton are found inside it.
   constructor(private page: Page) {
     this.yesRadio = page.getByRole('radio', { name: 'Yes' });
+    this.noRadio = page.getByRole('radio', { name: 'No', exact: true });
     this.nextButton = page.getByRole('button', { name: 'Next' });
     this.helpLink = page.getByRole('link', { name: 'Help' });
+    this.whoShouldIIncludeLink = page.getByRole('link', { name: 'Who should I include?', exact: true });
     this.helpModal = page.getByRole('dialog');
     this.helpBody = this.helpModal.locator('div.modal-body');
     // Found by its visible text, because the X icon is also named "Close".
@@ -31,6 +35,21 @@ export class CommonPage {
     await this.yesRadio.check();
   }
 
+  // Selects the No radio button.
+  async selectNo(): Promise<void> {
+    await this.noRadio.check();
+  }
+
+  // Finds a radio button by its text, e.g. radioOption('Rented?').
+  radioOption(optionName: string): Locator {
+    return this.page.getByRole('radio', { name: optionName, exact: true });
+  }
+
+  // Selects a radio button by its text, e.g. selectOption('Rented?').
+  async selectOption(optionName: string): Promise<void> {
+    await this.radioOption(optionName).check();
+  }
+
   // Clicks the Next button to go to the next screen.
   async clickNext(): Promise<void> {
     await this.nextButton.click();
@@ -39,6 +58,11 @@ export class CommonPage {
   // Clicks the Help link, which opens the Help pop-up.
   async clickHelp(): Promise<void> {
     await this.helpLink.click();
+  }
+
+  // On some screens (POPCOUNT, UNDERCOUNT) the Help link is called 'Who should I include?'.
+  async clickWhoShouldIIncludeLink(): Promise<void> {
+    await this.whoShouldIIncludeLink.click();
   }
 
   // Clicks the Close button in the Help pop-up, which closes the pop-up.

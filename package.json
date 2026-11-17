@@ -3,9 +3,13 @@
   "private": true,
   "scripts": {
     "test": "ts-node src/utilities/RunTests.ts",
-    "test:home": "ts-node src/utilities/RunTests.ts --tags @home",
+    "test:login": "ts-node src/utilities/RunTests.ts --tags @login",
     "test:confirm": "ts-node src/utilities/RunTests.ts --tags @confirm",
     "test:verify": "ts-node src/utilities/RunTests.ts --tags @verify",
+    "test:respondent": "ts-node src/utilities/RunTests.ts --tags @respondent",
+    "test:popcount": "ts-node src/utilities/RunTests.ts --tags @popcount",
+    "test:undercount": "ts-node src/utilities/RunTests.ts --tags @undercount",
+    "test:home": "ts-node src/utilities/RunTests.ts --tags @home",
     "test:regression": "ts-node src/utilities/RunTests.ts --tags @regression",
     "report": "ts-node -e \"require('./src/utilities/ReportGenerator').ReportGenerator.generate()\""
   },

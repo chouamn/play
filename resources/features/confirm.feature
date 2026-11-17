@@ -2,8 +2,8 @@
 Feature: ISR Confirm Screen Content Validation
 
   Scenario: ISR Confirm Screen Help Text Validation
-    # Log in (same steps as home.feature)
-    Given the responder is on the Census home page
+    # Log in (same steps as login.feature)
+    Given the responder is on the Census login page
     When the responder enters the Census ID "CENSUS_ID_VALID_1"
     And the responder clicks the Login button
     Then the responder is navigated to the Confirm page

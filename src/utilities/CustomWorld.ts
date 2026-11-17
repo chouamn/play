@@ -9,7 +9,9 @@ export class CustomWorld extends World {
   browser!: Browser;         // The browser that runs the scenario (set in Hooks.ts)
   context!: BrowserContext;  // A clean browser session: its own cookies and storage
   page!: Page;               // The browser tab the scenario works in
-  pages!: PageManager;       // All page objects, e.g. this.pages.home
+  pages!: PageManager;       // All page objects, e.g. this.pages.login
+  // The name typed on the Respondent screen, so later screens (e.g. UNDERCOUNT) can check it.
+  respondentName = { firstName: '', middleName: '', lastName: '' };
 
   // Creates the World. Cucumber calls this itself at the start of every scenario.
   constructor(options: IWorldOptions) {

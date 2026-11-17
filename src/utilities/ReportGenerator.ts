@@ -1,4 +1,5 @@
 import fs from 'fs';
+import { pathToFileURL } from 'url';
 import { chromium } from '@playwright/test';
 import { ConfigReader } from './ConfigReader';
 
@@ -13,7 +14,7 @@ import { ConfigReader } from './ConfigReader';
  * or by hand with: npm run report
  */
 
-const JSON_REPORT = 'reports/cucumber-report.json';
+export const JSON_REPORT = 'reports/cucumber-report.json';
 const HTML_REPORT = 'reports/ISR_Test_Report.html';
 const PDF_REPORT = 'reports/ISR_Test_Report.pdf';
 const LOGO_FILE = 'resources/assets/census-logo.svg';
@@ -95,7 +96,8 @@ export class ReportGenerator {
     const browser = await this.launchBrowser();
     try {
       const page = await browser.newPage();
-      await page.goto('file://' + fs.realpathSync(HTML_REPORT));
+      // pathToFileURL builds a correct file:// address on Windows too
+      await page.goto(pathToFileURL(HTML_REPORT).href);
       await page.evaluate(() => document.querySelectorAll('details').forEach(d => (d.open = true)));
       await page.pdf({
         path: PDF_REPORT,
@@ -206,7 +208,9 @@ export class ReportGenerator {
 
   // The error message, without the code location lines, with "Excel has" / "Screen has" coloured.
   private static errorBlock(message: string): string {
-    const lines = message.split('\n').filter(line => !line.trim().startsWith('at '));
+    // Playwright's messages carry terminal colour codes (e.g. [31m) – remove them first
+    const clean = message.replace(/\u001b\[[0-9;]*m/g, '');
+    const lines = clean.split('\n').filter(line => !line.trim().startsWith('at '));
     const coloured = lines.map(line => {
       const safe = this.escape(line);
       if (line.includes('Excel has:') || line.includes('Bold in Excel')) return `<span class="exp">${safe}</span>`;

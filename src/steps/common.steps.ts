@@ -11,6 +11,17 @@ When('the responder selects Yes', async function (this: CustomWorld) {
   await this.pages.common.selectYes();
 });
 
+// Selects the No answer on the current screen.
+When('the responder selects No', async function (this: CustomWorld) {
+  await this.pages.common.selectNo();
+});
+
+// Selects any radio button by its text, e.g. "Rented?", and checks it is selected.
+When('the responder selects the {string} option', async function (this: CustomWorld, optionName: string) {
+  await this.pages.common.selectOption(optionName);
+  await expect(this.pages.common.radioOption(optionName)).toBeChecked();
+});
+
 // Clicks the Next button to go to the next screen.
 When('the responder clicks the Next button', async function (this: CustomWorld) {
   await this.pages.common.clickNext();
@@ -19,6 +30,11 @@ When('the responder clicks the Next button', async function (this: CustomWorld) 
 // Clicks the Help link, which opens the Help pop-up.
 When('the responder clicks the Help tooltip', async function (this: CustomWorld) {
   await this.pages.common.clickHelp();
+});
+
+// On POPCOUNT and UNDERCOUNT the Help link is called 'Who should I include?'.
+When('the responder clicks the Who should I include link', async function (this: CustomWorld) {
+  await this.pages.common.clickWhoShouldIIncludeLink();
 });
 
 // Checks that the Help pop-up is open.
