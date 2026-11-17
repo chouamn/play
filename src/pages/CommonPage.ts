@@ -82,9 +82,9 @@ export class CommonPage {
     // Read the expected text and its bold parts from Excel
     const expectedText = await ExcelReader.readText(screen, language);
 
-    // Check 1: text and spacing (exact match, character by character)
+    // Check 1: text, spacing and bullets (exact match, character by character)
     await expect(locator).toBeVisible();
-    const actualText = await locator.innerText();
+    const actualText = await this.readTextWithBullets(locator);
 
     if (actualText !== expectedText.text) {
       throw new Error(this.describeTextDifference(actualText, expectedText.text, screen));
@@ -106,6 +106,29 @@ export class CommonPage {
         `  Bold on screen, but NOT bold in Excel: ${this.showList(extraBold)}`
       );
     }
+  }
+
+  // Reads the text on screen like innerText, but puts "• " in front of every bullet point.
+  // The browser draws bullets itself (they are not part of the text), so without this
+  // the test could not see them. Numbered lists and lists without bullets stay as they are.
+  private async readTextWithBullets(locator: Locator): Promise<string> {
+    return locator.evaluate(element => {
+      // 1. Put "• " in front of every list item that shows a bullet
+      const addedBullets: Text[] = [];
+      for (const listItem of Array.from(element.querySelectorAll('li'))) {
+        const bulletStyle = window.getComputedStyle(listItem).listStyleType;
+        if (['disc', 'circle', 'square'].includes(bulletStyle)) {
+          const bullet = document.createTextNode('• ');
+          listItem.insertBefore(bullet, listItem.firstChild);
+          addedBullets.push(bullet);
+        }
+      }
+      // 2. Read the text, now with the bullets in it
+      const text = (element as HTMLElement).innerText;
+      // 3. Remove the "• " again, so the page is exactly as it was
+      addedBullets.forEach(bullet => bullet.remove());
+      return text;
+    });
   }
 
   // Reads from the screen every part of the text that is bold.
